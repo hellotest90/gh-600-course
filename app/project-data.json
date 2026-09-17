@@ -1,0 +1,46 @@
+{
+  "projects": [
+    {
+      "name": "Contributor Onboarding",
+      "owner": "Maya Chen",
+      "status": "Active",
+      "recentActivity": "Refined the first-contribution checklist and added three starter issues.",
+      "priority": "High"
+    },
+    {
+      "name": "API Reliability",
+      "owner": "Jordan Lee",
+      "status": "In Progress",
+      "recentActivity": "Error budget review is complete; timeout improvements are ready for testing.",
+      "priority": "High"
+    },
+    {
+      "name": "Design System Refresh",
+      "owner": "Sam Rivera",
+      "status": "Planning",
+      "recentActivity": "Collected component feedback from the product and accessibility teams.",
+      "priority": "Medium"
+    },
+    {
+      "name": "Mobile Release",
+      "owner": "Avery Patel",
+      "status": "At Risk",
+      "recentActivity": "Waiting on authentication fixes before the release candidate can be shared.",
+      "priority": "Critical"
+    },
+    {
+      "name": "Search Improvements",
+      "owner": "Taylor Morgan",
+      "status": "Active",
+      "recentActivity": "Search analytics are now available in the staging environment.",
+      "priority": "Medium"
+    },
+    {
+      "name": "Knowledge Base",
+      "owner": "Casey Brooks",
+      "status": "On Hold",
+      "recentActivity": "Content audit is paused while the new information architecture is reviewed.",
+      "priority": "Low"
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A contributor-friendly overview of project status, activity, and priorities.">
+  <title>Project Pulse</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="site-header">
+      <div>
+        <p class="eyebrow">Team overview</p>
+        <h1>Project Pulse</h1>
+        <p class="intro">A quick read on what the team is building, who owns it, and where attention is needed.</p>
+      </div>
+      <div class="pulse-mark" aria-hidden="true">PP</div>
+    </header>
+
+    <main>
+      <section class="dashboard-section" aria-labelledby="projects-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Current work</p>
+            <h2 id="projects-heading">Projects</h2>
+          </div>
+          <p id="project-count" class="project-count" aria-live="polite">Loading projects...</p>
+        </div>
+
+        <div id="project-status" class="state-panel" role="status" aria-live="polite">
+          <span class="loading-spinner" aria-hidden="true"></span>
+          <span>Loading project pulse...</span>
+        </div>
+        <div id="project-grid" class="dashboard" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>Keep the momentum visible. Check in with a project owner when you can help.</p>
+    </footer>
+  </div>
+
+  <script>
+    const projectGrid = document.querySelector('#project-grid');
+    const projectStatus = document.querySelector('#project-status');
+    const projectCount = document.querySelector('#project-count');
+
+    const valueOrFallback = (value, fallback) => value || fallback;
+
+    function createField(label, value, className) {
+      const wrapper = document.createElement('div');
+      wrapper.className = className;
+      const term = document.createElement('dt');
+      term.textContent = label;
+      const detail = document.createElement('dd');
+      detail.textContent = value;
+      wrapper.append(term, detail);
+      return wrapper;
+    }
+
+    function renderProjects(projects) {
+      projectGrid.replaceChildren();
+      projectStatus.hidden = true;
+      projectGrid.hidden = false;
+      projectCount.textContent = `${projects.length} ${projects.length === 1 ? 'project' : 'projects'}`;
+
+      projects.forEach((project) => {
+        const card = document.createElement('article');
+        card.className = 'project-card';
+
+        const header = document.createElement('header');
+        header.className = 'card-header';
+        const title = document.createElement('h3');
+        title.textContent = valueOrFallback(project.name, 'Untitled project');
+        const status = document.createElement('span');
+        const statusValue = valueOrFallback(project.status, 'Unknown');
+        status.className = `badge badge-status status-${statusValue.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+        status.textContent = statusValue;
+        status.setAttribute('aria-label', `Status: ${statusValue}`);
+        header.append(title, status);
+
+        const owner = document.createElement('p');
+        owner.className = 'owner';
+        owner.textContent = `Owned by ${valueOrFallback(project.owner, 'Unassigned')}`;
+
+        const activity = document.createElement('div');
+        activity.className = 'activity-block';
+        const activityLabel = document.createElement('p');
+        activityLabel.className = 'field-label';
+        activityLabel.textContent = 'Recent activity';
+        const activityText = document.createElement('p');
+        activityText.className = 'activity';
+        activityText.textContent = valueOrFallback(project.recentActivity, 'No recent activity recorded.');
+        activity.append(activityLabel, activityText);
+
+        const details = document.createElement('dl');
+        details.className = 'card-details';
+        details.append(createField('Priority', valueOrFallback(project.priority, 'Not set'), 'detail priority-detail'));
+
+        card.append(header, owner, activity, details);
+        projectGrid.append(card);
+      });
+    }
+
+    function showState(message, kind) {
+      projectGrid.hidden = true;
+      projectStatus.hidden = false;
+      projectStatus.className = `state-panel state-${kind}`;
+      projectStatus.replaceChildren();
+      const heading = document.createElement('strong');
+      heading.textContent = kind === 'error' ? 'Unable to load projects' : 'No projects yet';
+      const detail = document.createElement('span');
+      detail.textContent = message;
+      projectStatus.append(heading, detail);
+      projectCount.textContent = '';
+    }
+
+    fetch('project-data.json')
+      .then((response) => {
+        if (!response.ok) throw new Error(`Project data request failed with status ${response.status}.`);
+        return response.json();
+      })
+      .then((data) => {
+        if (!data || !Array.isArray(data.projects)) throw new Error('Project data has an invalid format.');
+        if (data.projects.length === 0) {
+          showState('Add a project to start tracking team momentum.', 'empty');
+          return;
+        }
+        renderProjects(data.projects);
+      })
+      .catch((error) => {
+        console.error(error);
+        showState('Please refresh the page or check the project data source.', 'error');
+      });
+  </script>
+</body>
+</html>
